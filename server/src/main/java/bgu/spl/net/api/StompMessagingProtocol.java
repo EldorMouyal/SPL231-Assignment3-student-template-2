@@ -15,3 +15,4 @@ public interface StompMessagingProtocol<T>  {
      */
     boolean shouldTerminate();
 }
+
