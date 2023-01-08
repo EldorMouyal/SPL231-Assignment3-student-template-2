@@ -13,10 +13,11 @@ import bgu.spl.net.srv.Connections;
 public class ConnectionsImpl<T> implements Connections<T> {
     WeakHashMap<Integer, ConnectionHandler<T>> connections = new WeakHashMap<Integer,ConnectionHandler<T>>();;//clientId, connectionHandler
     List <ConnectionHandler<T>> connectionHandlers= new LinkedList<ConnectionHandler<T>>();;
-    HashMap<Integer,HashMap<Integer,String>> topicsOfClient=new HashMap<>();// [client id, and [topic id, sbscribed strings]]    [integer,[integer,string]]
+    HashMap<Integer,HashMap<Integer,String>> topicsOfClient=new HashMap<>();// [client id, and [topic id, sbscribed string]]    [integer,[integer,string]]
     HashMap<String, List<Integer[]>> subscriptionsOfChannel= new HashMap();// topic name and another hash map with client id and its topic id// 
     HashMap<String,String> UserNameToPassword= new HashMap<>();//[Name,Password]
     HashMap<Integer,String> UserNameToConnctionId =new HashMap<>();//[Name,ConnectionId]
+    Integer messageId=0;
     @Override
     public boolean send(int connectionId, T msg) {
         try{
@@ -37,6 +38,8 @@ public class ConnectionsImpl<T> implements Connections<T> {
         {
             send(arr[0], msg);
         }
+
+        messageId++;
     }
 
     @Override
@@ -84,10 +87,35 @@ public class ConnectionsImpl<T> implements Connections<T> {
          subscriptionsOfChannel.get(chanel).add(arr);
         }
     }
+
+    public void unsubscribe(int id, int connectionId)
+    {
+        HashMap<Integer,String> map =topicsOfClient.get(connectionId);
+        String chanel=map.get(id);
+        map.remove(id);
+        for(Integer[] a: subscriptionsOfChannel.get(chanel))
+        {
+            if(a[0]==connectionId)
+                subscriptionsOfChannel.get(chanel).remove(a);
+        }
+    }
     public void addHandler(ConnectionHandler<T> handler,int connectionId){
         connectionHandlers.add(handler);
         connections.put(connectionId, handler);
     }
+
+    public Integer getMessageId(){
+        return messageId;
+    }
+    public Integer getClientTopicId(int connectionId, String chanel){
+        HashMap<Integer,String> map =topicsOfClient.get(connectionId);
+        for(Integer i: map.keySet()){
+            if(map.get(i).equals(chanel))
+                return i;
+        }
+        return -1;
+    }
+    
     
 }
 
