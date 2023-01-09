@@ -2,15 +2,11 @@ package bgu.spl.net.impl;
 
 import bgu.spl.net.api.StompMessagingProtocol;
 import bgu.spl.net.srv.Connections;
-import bgu.spl.net.srv.Server;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.regex.Pattern;
 
-import javax.lang.model.util.ElementScanner6;
 
-import org.omg.CORBA.FloatSeqHelper;
 
 public class StompMessagingProtocolImpl implements StompMessagingProtocol<String> {
     Connections<String> connections;
@@ -28,30 +24,44 @@ public class StompMessagingProtocolImpl implements StompMessagingProtocol<String
     @Override
     public void process(String message) 
     {
-        String regex= "/n";
+        String regex= "\n";
         String[] lines= message.split(regex);
         lines= fixedFrameArray(lines);//returns an array with no \n and no spaces at the end of the lines
         this.errorM="ERROR\n"+checkReciptToAddForError(lines)+"message : malformed frame received\n\n"+"The message:\n-----\n";
-        if(!isCommand(lines[0]))
-            connections.send(connectionId, errorM+"no command was found");
+        if(!isCommand(lines[0].toUpperCase()))
+            sendError("no command was found");
         else
-            switch(lines[0]){
+            switch(lines[0].toUpperCase()){
                 case "CONNECT":
+                if(!connections.isConnected(connectionId))
                     caseConnect(lines,message);
+                    else
+                        sendError("Already connected");
                     break;
-
                 case "SEND":
-                caseSend(lines,message);             
+                if(!connections.isConnected(connectionId))
+                    sendError("Not connected");
+                    else
+                        caseSend(lines,message);             
                     break;
 
                 case "SUBSCRIBE":
-                   caseSubscribe(lines,message);
+                if(!connections.isConnected(connectionId))
+                    sendError("Not connected");
+                    else
+                        caseSubscribe(lines,message);
                     break;
                 case "UNSUBSCRIBE":
-                caseUnsubscribe(lines,message);
+                if(!connections.isConnected(connectionId))
+                    sendError("Not connected");
+                    else
+                        caseUnsubscribe(lines,message);
                     break;
                 case "DISCONNECT":
-                    caseDisconnect(lines,message);
+                if(!connections.isConnected(connectionId))
+                    sendError("Not connected");
+                    else
+                        caseDisconnect(lines,message);
                     break;
             }
         
@@ -110,24 +120,23 @@ public void  caseConnect(String[] lines,String message){
     boolean IsacceptVersion=false;
     boolean Isusername=false;
     boolean Ispassword=false;
-    boolean errorAccured=true;
     while(index<lines.length-1)
     {
         if(lines[index].split(":")[0].equals("host")){
             if(!lines[index].split(":")[1].equals("stomp.cs.bgu.ac.il"))
-                connections.send(connectionId, errorM+"host is not valid");
+            sendError("host is not valid");
             else
                 Ishost=true;
         }
         if(!lines[index].split(":")[0].equals("accept-version")){
             if(lines[index].split(":").length>1&&!lines[index].split(":")[1].equals("1.2"))
-                connections.send(connectionId, errorM+"accept-version is not valid");
+            sendError("accept-version is not valid");
             else
                 IsacceptVersion=true;
         }
         if(lines[index].split(":")[0].equals("username")){
             if(lines[index].split(":").length==1)
-                connections.send(connectionId, errorM+"username is not valid");
+            sendError("username is not valid");
             else{
                  username= lines[index].split(":")[1];
                  Isusername=true;}
@@ -135,7 +144,7 @@ public void  caseConnect(String[] lines,String message){
         
         if(lines[index].split(":")[0].equals("password")){ 
             if(lines[index].split(":").length==1)
-                connections.send(connectionId, errorM+"password is not valid");
+            sendError("password is not valid");
             else{
                 Ispassword=true;
                 password= lines[index].split(":")[1];
@@ -165,12 +174,11 @@ public void caseSend(String[] lines,String message)
     int index=1;
     boolean Isdestination=false;
     boolean Isbody=false;
-    boolean errorAccured=true;
     while(index<lines.length-1)
     {
         if(lines[index].split(":")[0].equals("destination")){
             if(lines[index].split(":").length==1)
-                connections.send(connectionId, errorM+"destination is not valid");
+            sendError("destination is not valid");
             else{
                  destination= lines[index].split(":")[1];
                  Isdestination=true;}
@@ -181,13 +189,15 @@ public void caseSend(String[] lines,String message)
         
     
      if(Isbody&&Isdestination&&lines[lines.length-1].equals("\u0000")){
+        if(!connections.IsSubscribed(connectionId, destination))
+        sendError("Not subscribed to channel");
+        else{
         body="MESSAGE\nsubscription:"+Integer.toString(connections.getClientTopicId(connectionId,destination))+"\n"+"message - id:"+Integer.toString(connections.getMessageId())+"\ndestination:"+destination+"\n\n"+body+"\n\u0000";
         connections.send(destination, body,connectionId);
-        checkAndSendRecipt(lines);
+        checkAndSendRecipt(lines);}
 
     }
-    else
-        terminate=true;
+    
         
         }
     }
@@ -203,14 +213,14 @@ public void caseSend(String[] lines,String message)
         {
             if(lines[i].split(":")[0].equals("destination")){
                 if(lines[i].split(":").length==1)
-                    connections.send(connectionId, errorM+"destination is not valid");
+                sendError("destination is not valid");
                 else{
                      topic= lines[i].split(":")[1];
                      IsTopic=true;} 
             }
             if(lines[i].split(":")[0].equals("id")){
                 if(lines[i].split(":").length==1)
-                    connections.send(connectionId, errorM+"id is not valid");
+                sendError("id is not valid");
                 else{
                      id= Integer.parseInt(lines[i].split(":")[1]);
                      IsId=true;} 
@@ -222,8 +232,6 @@ public void caseSend(String[] lines,String message)
             connections.subscribe(connectionId,topic, id);
             checkAndSendRecipt(lines);
         }
-        else
-            terminate=true;
         
     }
 
@@ -235,8 +243,7 @@ public void caseSend(String[] lines,String message)
         {
             if(lines[i].split(":").length==1)
                 {
-                    connections.send(connectionId, errorM+"id is not valid");
-                    terminate=true;
+                    sendError("id is not valid");
                 }
             else if(lines[lines.length-1].equals("\u0000")){
                 int id= Integer.parseInt(lines[i].split(":")[1]);
@@ -245,8 +252,7 @@ public void caseSend(String[] lines,String message)
                 break;
                  }
                  else{
-                    connections.send(connectionId, errorM+"no end of frame character was found");
-                    terminate=true;
+                    sendError("no end of frame character was found");
                 }
         }}
         
@@ -260,7 +266,7 @@ public void caseSend(String[] lines,String message)
             disconnect();
         }
         else{
-            connections.send(connectionId, errorM+"no end of frame character was found");
+            sendError("no end of frame character was found");
         }
 
     }
@@ -270,8 +276,7 @@ public void caseSend(String[] lines,String message)
         if(lines[i].split(":")[0].equals("receipt -id"))
         {
             if(lines[1].split(":").length==1){
-                connections.send(connectionId, errorM+"receipt is not valid");
-                terminate=true;
+                sendError("receipt is not valid");
             }
             else {
                 int recipt = Integer.parseInt(lines[i].split(":")[1]);
@@ -288,8 +293,7 @@ public void caseSend(String[] lines,String message)
         if(lines[i].split(":")[0].equals("receipt -id"))
         {
             if(lines[1].split(":").length==1){
-                connections.send(connectionId, errorM+"receipt is not valid");
-                terminate=true;
+                sendError("receipt is not valid");
                 return "";}
             else {
                 int recipt = Integer.parseInt(lines[i].split(":")[1]);
@@ -305,6 +309,14 @@ public void caseSend(String[] lines,String message)
     {
         this.errorM="ERROR\nmessage : malformed frame received\n\n"+"The message:\n-----\n";
 
+    }
+
+    private void sendError(String message)
+    {
+        errorM+=message+"\n-----\n";
+        connections.send(connectionId, errorM+message+"\n"+"\u0000");
+        disconnect();
+        terminate=true;
     }
     
 
