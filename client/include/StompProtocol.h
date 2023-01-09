@@ -6,5 +6,7 @@
 class StompProtocol
 {
 private:
+
 public:
+//std:: string process();
 };

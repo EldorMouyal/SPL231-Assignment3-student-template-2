@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include "../include/ConnectionHandler.h"
 #include <thread>
+#include "../include/stompFrame.h"
+using namespace std;
 
 int main(int argc, char *argv[]) {
 	// TODO: implement the STOMP client
@@ -18,7 +20,7 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-	std:: thread keyboardThread (ConnectionHandler connectionHandler);
+	std:: thread keyboardThread (keyboardInput , connectionHandler);
 
 	while(1){
 		// We can use one of three options to read data from the server:
@@ -46,7 +48,7 @@ int main(int argc, char *argv[]) {
 	return 0;
 }
 
-void keyboardInput(ConnectionHandler handler){
+void keyboardInput(ConnectionHandler &handler){
 	while (1) {
         const short bufsize = 1024;
         char buf[bufsize];
@@ -61,3 +63,33 @@ void keyboardInput(ConnectionHandler handler){
         std::cout << "Sent " << len+1 << " bytes to server" << std::endl;
 	}
 }
+void processInput(string line){
+stompFrame frame;
+int i=0 ;
+string command = "";
+while(i<line.length()){
+command += line[i];
+if(command == "login"){
+    frame.addHeader("CONNECT");
+    break;
+}
+if(command == "join"){
+    frame.addHeader("SUBSCRIBE");
+    break;
+}
+if(command == "exit"){
+    frame.addHeader("UNSUBSCRIBE");
+    break;
+}
+if(command == "report"){
+    frame.addHeader("SEND");
+    break;
+}
+if(command == "logout"){
+    frame.addHeader("DISCONNECT");
+}
+}
+
+}
+
+ 

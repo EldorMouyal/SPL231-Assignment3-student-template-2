@@ -12,8 +12,8 @@ std::string body;
 
 public:
 stompFrame();
-void addHeader(std::string header);
-void addOp(std::string op);
+void addCommand(std::string header);
+void addHeader(std::string key, std::string value);
 void addBody(std::string);
 bool isFrameComplete();
 std::string getFrame();
