@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include "../include/ConnectionHandler.h"
 #include <thread>
+#include <vector>
 #include "../include/stompFrame.h"
 using namespace std;
 
@@ -70,25 +71,36 @@ string command = "";
 while(i<line.length()){
 command += line[i];
 if(command == "login"){
-    frame.addHeader("CONNECT");
+    frame.addCommand("CONNECT");
     break;
 }
 if(command == "join"){
-    frame.addHeader("SUBSCRIBE");
+    frame.addCommand("SUBSCRIBE");
     break;
 }
 if(command == "exit"){
-    frame.addHeader("UNSUBSCRIBE");
+    frame.addCommand("UNSUBSCRIBE");
     break;
 }
 if(command == "report"){
-    frame.addHeader("SEND");
+    frame.addCommand("SEND");
     break;
 }
 if(command == "logout"){
-    frame.addHeader("DISCONNECT");
+    frame.addCommand("DISCONNECT");
 }
 }
+}
+
+void processLine(string input){
+    vector<string> words;
+    string word;
+    string delimiter = " ";
+    int position;
+    while(position = input.find(delimiter) != string::npos){
+        word = input.substr(0,position);
+        
+    }
 
 }
 
