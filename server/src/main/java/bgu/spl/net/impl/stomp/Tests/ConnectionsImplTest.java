@@ -1,6 +1,5 @@
 package bgu.spl.net.impl.stomp.Tests;
 
-import static org.junit.jupiter.api.Assertions.*;
 
 class ConnectionsImplTest {
 

@@ -4,7 +4,6 @@ import bgu.spl.net.impl.StompMessagingProtocolImpl;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
 
 class StompMessagingProtocolImplTest {
     StompMessagingProtocolImpl stomp= new StompMessagingProtocolImpl();
