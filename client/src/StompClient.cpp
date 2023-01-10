@@ -5,6 +5,9 @@
 #include "../include/stompFrame.h"
 using namespace std;
 
+
+int receipt = 0;
+int clientID = 0;
 int main(int argc, char *argv[]) {
 	// TODO: implement the STOMP client
 	
@@ -55,7 +58,11 @@ void keyboardInput(ConnectionHandler &handler){
         char buf[bufsize];
         std::cin.getline(buf, bufsize);
 		std::string line(buf);
-		int len=line.length();
+
+        stompFrame frame = stompFrame(processLine(line), clientID, receipt);
+        line = frame.getFrame();
+        
+		int len = line.length();
         if (!handler.sendLine(line)) {
             std::cout << "Disconnected. Exiting...\n" << std::endl;
             break;
@@ -64,44 +71,18 @@ void keyboardInput(ConnectionHandler &handler){
         std::cout << "Sent " << len+1 << " bytes to server" << std::endl;
 	}
 }
-void processInput(string line){
-stompFrame frame;
-int i=0 ;
-string command = "";
-while(i<line.length()){
-command += line[i];
-if(command == "login"){
-    frame.addCommand("CONNECT");
-    break;
-}
-if(command == "join"){
-    frame.addCommand("SUBSCRIBE");
-    break;
-}
-if(command == "exit"){
-    frame.addCommand("UNSUBSCRIBE");
-    break;
-}
-if(command == "report"){
-    frame.addCommand("SEND");
-    break;
-}
-if(command == "logout"){
-    frame.addCommand("DISCONNECT");
-}
-}
-}
 
-void processLine(string input){
+
+vector<string> processLine(string input){
     vector<string> words;
     string word;
     string delimiter = " ";
-    int position;
+    int position = 0;    
     while(position = input.find(delimiter) != string::npos){
-        word = input.substr(0,position);
-        
+        words.push_back(input.substr(0, position-1));
+        input.erase(0, position +1);        
     }
-
+    return words;
 }
 
  
