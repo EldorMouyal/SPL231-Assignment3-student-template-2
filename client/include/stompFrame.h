@@ -8,24 +8,24 @@ class stompFrame{
 private :
 std::string command;
 std::vector<std::string> headers;
+std:: vector<std:: string> frames;
 std::string body;
 std::string frame;
-int clientID;
+int subscriptionID;
 int receipt;
-void buildFrame();
 void addCommand(std::string header);
 void addHeader(std::string key, std::string value);
-void addBody(std::string);
+void setBody(std::string);
 void createLoginFrame(std::string host, std::string port, std::string username, std::string password);
 void createJoinFrame(std::string gameName);
 void createExitFrame(std:: string gameName, int receipt);
-void createReportFrame(string report);
+void createReportFrame(string report, string userName);
 void createLogoutFrame(int receipt);
+std::string buildFrame();
 
 
 public:
-stompFrame(string line, int id, int receipt);
-std::string getFrame();
-void addBody(std::string);
+stompFrame(vector<string> words, int id, int receipt);
+vector<string> getFrames();
 
 };
