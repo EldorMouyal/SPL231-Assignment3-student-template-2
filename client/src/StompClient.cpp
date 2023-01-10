@@ -7,17 +7,19 @@ using namespace std;
 
 
 int receipt = 0;
-int clientID = 0;
+int subscriptionID = 0;
+string connectedUser;
 int main(int argc, char *argv[]) {
 	// TODO: implement the STOMP client
 	
-	if (argc < 3) {
-        std::cerr << "Usage: " << argv[0] << " host port" << std::endl << std::endl;
-        return -1;
-    }
-    std::string host = argv[1];
-    short port = atoi(argv[2]);
-    
+	// if (argc < 3) {
+    //     std::cerr << "Usage: " << argv[0] << " host port" << std::endl << std::endl;
+    //     return -1;
+    // }
+    // std::string host = argv[1];
+    // short port = atoi(argv[2]);
+    std::string host = "stomp.cs.bgu.ac.il";
+    short port = atoi("1.2");
     ConnectionHandler connectionHandler(host, port);
     if (!connectionHandler.connect()) {
         std::cerr << "Cannot connect to " << host << ":" << port << std::endl;
@@ -59,21 +61,24 @@ void keyboardInput(ConnectionHandler &handler){
         std::cin.getline(buf, bufsize);
 		std::string line(buf);
 
-        stompFrame frame = stompFrame(processLine(line), clientID, receipt);
-        line = frame.getFrame();
-        
-		int len = line.length();
-        if (!handler.sendLine(line)) {
-            std::cout << "Disconnected. Exiting...\n" << std::endl;
-            break;
+        //stompFrame frame = stompFrame(processLine(line), subscriptionID, receipt);
+        //string serverFrame = frame.getFrame();
+        //ine = frame.getFrame();
+        vector<string> frames = processLine(line);
+        for(int i=0; i<frames.size(); i++){
+            int len = frames[i].length();
+            if (!handler.sendLine(frames[i])) {
+                std::cout << "Disconnected. Exiting...\n" << std::endl;
+                break;
+            }
+            // connectionHandler.sendLine(line) appends '\n' to the message. Therefor we send len+1 bytes.
+            std::cout << "Sent " << len+1 << " bytes to server" << std::endl;
         }
-		// connectionHandler.sendLine(line) appends '\n' to the message. Therefor we send len+1 bytes.
-        std::cout << "Sent " << len+1 << " bytes to server" << std::endl;
 	}
 }
 
 
-vector<string> processLine(string input){
+vector<string> processLine(string input){    
     vector<string> words;
     string word;
     string delimiter = " ";
@@ -82,7 +87,10 @@ vector<string> processLine(string input){
         words.push_back(input.substr(0, position-1));
         input.erase(0, position +1);        
     }
-    return words;
+    if(words[0] == "report")
+        words.push_back(connectedUser);
+    stompFrame frame = stompFrame(words, subscriptionID, receipt);
+    return frame.getFrames();
 }
 
  
