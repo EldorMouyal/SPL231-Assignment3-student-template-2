@@ -21,6 +21,7 @@ public class StompMessagingProtocolImpl implements StompMessagingProtocol<String
         this.connectionId=connectionId;
     }
 
+
     @Override
     public void process(String message) 
     {
@@ -101,7 +102,7 @@ public class StompMessagingProtocolImpl implements StompMessagingProtocol<String
         }
         fixed= new String[strings.size()];
         for(String s:strings){
-            fixed[insertIndex]=s;
+            fixed[insertIndex]=s.trim();
             if(insertIndex>0)
                 fixed[insertIndex].toLowerCase();
             insertIndex++;
@@ -145,10 +146,12 @@ public void  caseConnect(String[] lines,String message){
         if(lines[index].split(":")[0].equals("password")){ 
             if(lines[index].split(":").length==1)
             sendError("password is not valid");
-            else{
+            else if(!connections.isRegisterd(username)||connections.IsCorrectPassword(username,password)){
                 Ispassword=true;
                 password= lines[index].split(":")[1];
             }
+            else
+                sendError("wrong password");
          }
 
         index++;
@@ -290,7 +293,7 @@ public void caseSend(String[] lines,String message)
     public String checkReciptToAddForError(String[] lines)
     {
         for(int i=1; i<lines.length-1; i++){
-        if(lines[i].split(":")[0].equals("receipt -id"))
+        if(lines[i].split(":")[0].equals("receipt"))
         {
             if(lines[1].split(":").length==1){
                 sendError("receipt is not valid");
@@ -316,6 +319,10 @@ public void caseSend(String[] lines,String message)
         errorM+=message+"\n-----\n";
         connections.send(connectionId, errorM+message+"\n"+"\u0000");
         disconnect();
+        terminate=true;
+    }
+    public void Terminate()//for test purposes only
+    {
         terminate=true;
     }
     

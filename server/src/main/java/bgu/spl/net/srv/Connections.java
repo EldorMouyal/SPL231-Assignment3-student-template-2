@@ -19,4 +19,5 @@ public interface Connections<T> {
     public boolean IsSubscribed(int connectionId, String chanel);
     public boolean isRegisterd(String userName);
     public boolean isConnected(int connectionId);
+    public boolean IsCorrectPassword(String userName,String password);
 }

@@ -24,7 +24,7 @@ public class ConnectionsImpl<T> implements Connections<T> {
             connections.get(connectionId).send(msg);
             return true;
         }
-  
+
             catch(Exception e){
             return false;
         }
@@ -59,8 +59,6 @@ public class ConnectionsImpl<T> implements Connections<T> {
        //if not contains name
         UserNameToPassword.put(name, password);
         UserNameToConnctionId.put(name, conntionId);
-        //how to add a connection handler ???SSS
-        
     }
 
     public boolean isRegisterd(String userName)
@@ -68,6 +66,10 @@ public class ConnectionsImpl<T> implements Connections<T> {
         if(UserNameToPassword.containsKey(userName))
             return true;
         return false;
+    }
+    public boolean IsCorrectPassword(String userName,String password)
+    {
+        return UserNameToPassword.get(userName).equals(password);
     }
 
     public boolean isConnected(int connectionId)
