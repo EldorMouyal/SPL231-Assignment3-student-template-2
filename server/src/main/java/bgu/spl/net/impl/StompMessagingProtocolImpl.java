@@ -157,10 +157,10 @@ public void  caseConnect(String[] lines,String message){
         index++;
         
     
-     if(Ispassword&&IsacceptVersion&&Ishost&&Isusername&&lines[lines.length-1].equals("\u0000"))
+     if(Ispassword&&IsacceptVersion&&Ishost&&Isusername)
        {
         connections.connect(username, password, connectionId);
-        connections.send(connectionId, "CONNECTED\nversion:1.2\n\n\u0000");
+        connections.send(connectionId, "CONNECTED\nversion:1.2\n\n");
         checkAndSendRecipt(lines);
        }
        else
@@ -191,11 +191,11 @@ public void caseSend(String[] lines,String message)
         index++;
         
     
-     if(Isbody&&Isdestination&&lines[lines.length-1].equals("\u0000")){
+     if(Isbody&&Isdestination){
         if(!connections.IsSubscribed(connectionId, destination))
         sendError("Not subscribed to channel");
         else{
-        body="MESSAGE\nsubscription:"+Integer.toString(connections.getClientTopicId(connectionId,destination))+"\n"+"message - id:"+Integer.toString(connections.getMessageId())+"\ndestination:"+destination+"\n\n"+body+"\n\u0000";
+        body="MESSAGE\nsubscription:"+Integer.toString(connections.getClientTopicId(connectionId,destination))+"\n"+"message - id:"+Integer.toString(connections.getMessageId())+"\ndestination:"+destination+"\n\n"+body+"\n";
         connections.send(destination, body,connectionId);
         checkAndSendRecipt(lines);}
 
@@ -231,7 +231,7 @@ public void caseSend(String[] lines,String message)
             i++;
         }
 
-        if(IsTopic&&IsId&&lines[lines.length-1].equals("\u0000")){
+        if(IsTopic&&IsId){
             connections.subscribe(connectionId,topic, id);
             checkAndSendRecipt(lines);
         }
@@ -248,30 +248,26 @@ public void caseSend(String[] lines,String message)
                 {
                     sendError("id is not valid");
                 }
-            else if(lines[lines.length-1].equals("\u0000")){
+            else{
                 int id= Integer.parseInt(lines[i].split(":")[1]);
                 connections.unsubscribe(connectionId,id);
                 checkAndSendRecipt(lines);
                 break;
                  }
-                 else{
-                    sendError("no end of frame character was found");
-                }
+
         }}
         
     }
 
     public void caseDisconnect(String[] lines,String message)
     {
-        int recipt = Integer.parseInt(lines[1].split(":")[1]);
-        if(lines[lines.length-1].equals("\u0000")){
-            connections.send(connectionId, "RECEIPT\nreceipt -id:"+recipt+"\n\u0000");
+        if(lines[1].split(":").length==2&&lines[1].split(":")[0]=="receipt") {
+            int recipt = Integer.parseInt(lines[1].split(":")[1]);
+            connections.send(connectionId, "RECEIPT\nreceipt -id:" + recipt + "\n\u0000");
             disconnect();
         }
-        else{
-            sendError("no end of frame character was found");
-        }
-
+        else
+            sendError("no valid receipt");
     }
     public void checkAndSendRecipt(String[] lines)
     {
@@ -317,7 +313,7 @@ public void caseSend(String[] lines,String message)
     private void sendError(String message)
     {
         errorM+=message+"\n-----\n";
-        connections.send(connectionId, errorM+message+"\n"+"\u0000");
+        connections.send(connectionId, errorM+message+"\n");
         disconnect();
         terminate=true;
     }
