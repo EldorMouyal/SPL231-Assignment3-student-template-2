@@ -10,16 +10,46 @@ int receipt = 0;
 int subscriptionID = 0;
 string connectedUser;
 int main(int argc, char *argv[]) {
-	// TODO: implement the STOMP client
-	
-	// if (argc < 3) {
-    //     std::cerr << "Usage: " << argv[0] << " host port" << std::endl << std::endl;
-    //     return -1;
-    // }
-    // std::string host = argv[1];
-    // short port = atoi(argv[2]);
+	bool userConnected = false;
+    string host;
+    short port;
+    vector<string> words;
+    const short bufsize = 1024;
+    char buf[bufsize];
+    ConnectionHandler* cHandler;
+    while (1) {
+        while(!userConnected){
+        std::cin.getline(buf, bufsize);
+		std::string line(buf);
+        vector<string> words = processLine(line);
+        if(words[0] != "login"){
+            cout <<"to perform any action please log in first" << endl;
+        }
+        else{
+            string portstr = words[1].substr(words[1].find(':')+1,words[1].length());
+                port = stoi(portstr);
+                ConnectionHandler c("bgu.spl.ac.il",port);
+                cHandler = new ConnectionHandler ("bgu.spl.ac.il",port);
+        }
+        }
+        
+        if(words[0] == "report")
+        words.push_back(connectedUser);
+        stompFrame frame = stompFrame(words, subscriptionID, receipt);
+        vector<string> frames = frame.getFrames();
+        for(int i=0; i<frames.size(); i++){
+            int len = frames[i].length();
+            //bool trySend = cHandler->sendLine(frames[i]);
+            if (!cHandler->sendLine(frames[i])) {
+                std::cout << "Disconnected. Exiting...\n" << std::endl;
+                break;
+            }
+            // connectionHandler.sendLine(line) appends '\n' to the message. Therefor we send len+1 bytes.
+            std::cout << "Sent " << len+1 << " bytes to server" << std::endl;
+        }
+	}
     std::string host = "stomp.cs.bgu.ac.il";
-    short port = atoi("1.2");
+    short port = atoi("1.2");//not related
     ConnectionHandler connectionHandler(host, port);
     if (!connectionHandler.connect()) {
         std::cerr << "Cannot connect to " << host << ":" << port << std::endl;
@@ -87,10 +117,11 @@ vector<string> processLine(string input){
         words.push_back(input.substr(0, position-1));
         input.erase(0, position +1);        
     }
-    if(words[0] == "report")
-        words.push_back(connectedUser);
-    stompFrame frame = stompFrame(words, subscriptionID, receipt);
-    return frame.getFrames();
+    // if(words[0] == "report")
+    //     words.push_back(connectedUser);
+    // stompFrame frame = stompFrame(words, subscriptionID, receipt);
+    // return frame.getFrames();
+    return words;
 }
 
  

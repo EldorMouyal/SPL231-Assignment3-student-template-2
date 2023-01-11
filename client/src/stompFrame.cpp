@@ -9,7 +9,8 @@ this->receipt = _receipt;
 int i=0 ;
 string command = words[0];
 if(command == "login"){
-    createLoginFrame(words[1],words[2],words[3],words[4]);
+    string port = words[1].substr(words[1].find(':')+1,words[1].length());
+    createLoginFrame(port,words[2],words[3]);
 }
 if(command == "join"){
     createJoinFrame(words[1]);
@@ -29,11 +30,12 @@ if(command == "logout"){
 
 
 
-void stompFrame:: createLoginFrame(string host, string port, string username, string password){
+void stompFrame:: createLoginFrame(string port, string username, string password){
     addCommand("CONNECT");
-    addHeader("accept-version", port);
-    addHeader("host",host);
-    addHeader(username,password);
+    addHeader("accept-version", "1.2");
+    addHeader("host","stomp.cs.bgu.ac.il");
+    addHeader("login", username);
+    addHeader("passcode", password);
     frames.push_back(buildFrame());
 }
 
