@@ -16,7 +16,7 @@ int receipt;
 void addCommand(std::string header);
 void addHeader(std::string key, std::string value);
 void setBody(std::string);
-void createLoginFrame(std::string host, std::string port, std::string username, std::string password);
+void createLoginFrame(std::string port, std::string username, std::string password);
 void createJoinFrame(std::string gameName);
 void createExitFrame(std:: string gameName, int receipt);
 void createReportFrame(string report, string userName);
