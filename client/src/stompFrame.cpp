@@ -53,6 +53,7 @@ void stompFrame:: createExitFrame(string gameName, int receipt){// where do i ge
     addHeader("receipt", ""+ receipt);
     frames.push_back(buildFrame());
 }
+
 void stompFrame:: createReportFrame(string file, string userName){
     names_and_events nae = parseEventsFile(file);
     addCommand("SEND");
