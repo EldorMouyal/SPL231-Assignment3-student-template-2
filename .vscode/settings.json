@@ -61,7 +61,6 @@
         "utility": "cpp",
         "valarray": "cpp",
         "variant": "cpp",
-        "filesystem": "cpp",
         "*.ipp": "cpp"
     },
     "makefile.makefilePath": "client/"
