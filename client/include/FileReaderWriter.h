@@ -10,7 +10,7 @@ using std::string;
 class FileReaderWriter
 {
 public:
-    FileReaderWriter(string);
+    FileReaderWriter(string team_A,string team_b,string userName);
     ~FileReaderWriter();
     void write(string);
     string read();
@@ -18,6 +18,7 @@ public:
 private:
     string m_file;
     std::ofstream MyWriteFile;
+    bool IsFileEmpty();
     void open();
     void close();
 };

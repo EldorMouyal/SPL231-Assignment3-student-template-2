@@ -11,14 +11,27 @@ using namespace std;
 using std::string;
 
 //its recommended the string of the fileName will be "TeamA VS Team B UserName_User"
-FileReaderWriter::FileReaderWriter(string m_fileName):MyWriteFile(m_fileName),m_file(m_fileName) {}
+FileReaderWriter::FileReaderWriter(string team_a,string team_b,string userName):MyWriteFile(team_a+" "+team_b+" "+userName),m_file(team_a+" "+team_b+" "+userName) {
+if (IsFileEmpty())
+{
+    open();
+    bool isFileEmpty = IsFileEmpty();
+    close();
+    if (isFileEmpty)
+    {
+        write(team_a+" VS"+team_b);
+    }
 
-FileReaderWriter::~FileReaderWriter() {}
+}
+}
+
+FileReaderWriter::~FileReaderWriter()
+{}
 
 void FileReaderWriter::write(string line) {
     ofstream file;
     file.open(m_file, ios::app);
-    file << line << "\n";
+    file << "General stats:\n"+line << "\n\n";
     file.close();
 }
 string FileReaderWriter::read()
@@ -46,4 +59,8 @@ void FileReaderWriter::open() {
 void FileReaderWriter::close() {
     ofstream file;
     file.close();
+}
+bool FileReaderWriter::IsFileEmpty()
+{
+    return (MyWriteFile.tellp() == 0);
 }
