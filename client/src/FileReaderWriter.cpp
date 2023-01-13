@@ -10,6 +10,7 @@ using std::ofstream;
 using namespace std;
 using std::string;
 
+//its recommended the string of the fileName will be "TeamA VS Team B UserName_User"
 FileReaderWriter::FileReaderWriter(string m_fileName):MyWriteFile(m_fileName),m_file(m_fileName) {}
 
 FileReaderWriter::~FileReaderWriter() {}
@@ -17,7 +18,7 @@ FileReaderWriter::~FileReaderWriter() {}
 void FileReaderWriter::write(string line) {
     ofstream file;
     file.open(m_file, ios::app);
-    file << line << "\n\n\n";
+    file << line << "\n";
     file.close();
 }
 string FileReaderWriter::read()
