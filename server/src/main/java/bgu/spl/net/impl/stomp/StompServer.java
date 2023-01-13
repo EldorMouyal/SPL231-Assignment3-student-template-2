@@ -5,7 +5,7 @@ import bgu.spl.net.impl.StompMessagingProtocolImpl;
 import bgu.spl.net.srv.Server;
 
 public class StompServer {
-
+// ./bin/StompWCIClient 127.0.0.1 7777
     public static void main(String[] args) {
         args = new String[] {"127.0.0.1", "tpc"};
         if(args[1].equals("reactor"))

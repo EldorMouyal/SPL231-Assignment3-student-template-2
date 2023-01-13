@@ -5,26 +5,28 @@
 #include "../include/stompFrame.h"
 using namespace std;
 
-static vector<string> processLine(string input){    
-    vector<string> words;
-    string word;
-    string delimiter = " ";
-    int position = 0;    
-    while(position = input.find(delimiter) != string::npos){
-        words.push_back(input.substr(0, position-1));
-        input.erase(0, position +1);        
+
+ static std::vector<std::string> split(const std::string& str, char delimiter) {
+    std::vector<std::string> result;
+    std::string current;
+    for (const char& c : str) {
+        if (c == delimiter) {
+            result.push_back(current);
+            current.clear();
+        } else {
+            current += c;
+        }
     }
-    // if(words[0] == "report")
-    //     words.push_back(connectedUser);
-    // stompFrame frame = stompFrame(words, subscriptionID, receipt);
-    // return frame.getFrames();
-    return words;
+    result.push_back(current);
+    return result;
 }
+
 
 int receipt = 0;
 int subscriptionID = 0;
 string connectedUser;
 int main(int argc, char *argv[]) {
+    cout << "client started" <<endl;
 	bool userConnected = false;
     string host;
     short port;
@@ -33,33 +35,38 @@ int main(int argc, char *argv[]) {
     char buf[bufsize];
     ConnectionHandler* cHandler;
     //while (1) {
-        while(!userConnected){
-        std::cin.getline(buf, bufsize);
+    while(!userConnected){
+        string input;
+        //getline(cin, input);
+        std::cin.getline(buf, bufsize);       
 		std::string line(buf);
-        vector<string> words = processLine(line);
+        
+        words = split(line,' ');
         if(words[0] != "login"){
             cout <<"to perform any action please log in first" << endl;
         }
         else if(words.size() >= 2){         
             string portstr = words[1].substr(words[1].find(':')+1,words[1].length());
+            vector<string> hostPort = split(words[1],':');
             connectedUser = words[2];
-            port = stoi(portstr);
-            cHandler = new ConnectionHandler ("bgu.spl.ac.il",port);
+            port = stoi(hostPort[1]);  
+            cHandler = new ConnectionHandler (hostPort[0],port);
+            userConnected = true;
         }
         else{
             cout <<"invalid login input"<< endl;
         }
-        }
+    }
         //std:: thread keyboardThread (keyboardInput , cHandler); 
 
         // if(words[0] == "report")
         // words.push_back(connectedUser);
-        stompFrame frame = stompFrame(words, subscriptionID, receipt);
-        vector<string> frames = frame.getFrames();
-        cout<<frames[0]<<endl;//up to here;
+    cout<< "creating frame" << endl;
+    stompFrame frame = stompFrame(words , subscriptionID, receipt);
+    vector<string> frames = frame.getFrames();
+    cout<<frames[0]<<endl;//up to here;
         for(int i=0; i<frames.size(); i++){
             int len = frames[i].length();
-            //bool trySend = cHandler->sendLine(frames[i]);
             if (!cHandler->sendLine(frames[i])) {
                 std::cout << "Disconnected. Exiting...\n" << std::endl;
                 break;
@@ -102,7 +109,7 @@ int main(int argc, char *argv[]) {
     //         break;
     //     }
 	// }
-    delete cHandler;
+    //delete cHandler;
 	return 0;
 }
 
@@ -113,8 +120,8 @@ void keyboardInput(ConnectionHandler &handler){
         std::cin.getline(buf, bufsize);
 		std::string line(buf);
 
-        vector<string> frames = processLine(line);
-        for(int i=0; i<frames.size(); i++){
+        vector<string> frames = split(line, ' ');
+        for(int i=0; i < frames.size(); i++){
             int len = frames[i].length();
             if (!handler.sendLine(frames[i])) {
                 std::cout << "Disconnected. Exiting...\n" << std::endl;

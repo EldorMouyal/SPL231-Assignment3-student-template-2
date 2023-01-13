@@ -2,13 +2,10 @@
 #include "../include/event.h"
 using namespace std;
 
-stompFrame:: stompFrame(vector<string> words, int subscriptionID, int _receipt){
-this->subscriptionID = subscriptionID;
-this->receipt = _receipt;
-
-int i=0 ;
+stompFrame:: stompFrame(vector<string> &words, int _subscriptionID, int _receipt): headers(), frames(), body(), frame(),subscriptionID(_subscriptionID), receipt(_receipt){
 string command = words[0];
-if(command == "login"){
+
+if(command == string("login")){   
     string port = words[1].substr(words[1].find(':')+1,words[1].length());
     createLoginFrame(port,words[2],words[3]);
 }
@@ -16,27 +13,28 @@ if(command == "join"){
     createJoinFrame(words[1]);
 }
 if(command == "exit"){
-    createExitFrame(words[1],receipt);// TODO: implement this properley later
-    
+    createExitFrame(words[1],receipt);// TODO: implement this properley later  
 }
 if(command == "report"){
     createReportFrame(words[1],words[2]);// TODO: implement this later
 }
 if(command == "logout"){
     createLogoutFrame(receipt);// where do I get this receipt from?
-
 }
 }
 
 
 
 void stompFrame:: createLoginFrame(string port, string username, string password){
-    addCommand("CONNECT");
+  
+    addCommand("CONNECT");     
     addHeader("accept-version", "1.2");
     addHeader("host","stomp.cs.bgu.ac.il");
     addHeader("login", username);
     addHeader("passcode", password);
+   
     frames.push_back(buildFrame());
+    
 }
 
 void stompFrame:: createJoinFrame(string gameName){
@@ -88,7 +86,7 @@ void stompFrame:: createReportFrame(string file, string userName){
     frames.push_back(buildFrame());
  }
 
-void stompFrame:: addCommand(string _command){  
+void stompFrame:: addCommand(string _command){
         this->command = _command;
 }
 

@@ -25,7 +25,7 @@ std::string buildFrame();
 
 
 public:
-stompFrame(std::vector<std::string> words, int id, int receipt);
+stompFrame(std::vector<std::string> &words, int id, int receipt);
 std::vector<std::string> getFrames();
 
 };
