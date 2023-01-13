@@ -5,11 +5,15 @@ import bgu.spl.net.impl.StompMessagingProtocolImpl;
 import bgu.spl.net.srv.Server;
 
 public class StompServer {
-
+// ./bin/StompWCIClient 127.0.0.1 7777
     public static void main(String[] args) {
+<<<<<<< HEAD
         //args= new String[]{"7777","tpc"};
         if(args.length>=2)
         {
+=======
+        args = new String[] {"127.0.0.1", "tpc"};
+>>>>>>> e263f997b6c8ffb704d5ccf5f750b4b477a00914
         if(args[1].equals("reactor"))
             Server.reactor(
                     Runtime.getRuntime().availableProcessors(),
