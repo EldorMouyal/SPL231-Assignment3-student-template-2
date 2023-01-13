@@ -1,4 +1,4 @@
-#pragma onc
+#pragma once
 #include <string>
 #include <vector>
 #include <iostream>
@@ -15,8 +15,9 @@ public:
     void write(string);
     string read();
 
-    private:
-    string file;
+private:
+    string m_file;
+    std::ofstream MyWriteFile;
     void open();
     void close();
 };
