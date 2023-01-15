@@ -34,6 +34,14 @@ public class StompMessagingProtocolImpl implements StompMessagingProtocol<String
         else
             switch(lines[0].toUpperCase()){
                 case "CONNECT":
+                System.out.println("connect in proccess");
+                if(!connections.isConnected(connectionId))
+                    caseConnect(lines,message);
+                    else
+                        sendError("Already connected");
+                    break;
+
+                case "STOMP":
                 if(!connections.isConnected(connectionId))
                     caseConnect(lines,message);
                     else
@@ -121,21 +129,21 @@ public void  caseConnect(String[] lines,String message){
     boolean IsacceptVersion=false;
     boolean Isusername=false;
     boolean Ispassword=false;
-    while(index<lines.length-1)
+    while(index<lines.length)
     {
         if(lines[index].split(":")[0].equals("host")){
-            if(!lines[index].split(":")[1].equals("stomp.cs.bgu.ac.il"))
+            if(!lines[index].split(":")[1].equals("stomp.cs.bgu.ac.il")||!lines[index].split(":")[1].equals("localhost"))//local host case is for testing
             sendError("host is not valid");
             else
                 Ishost=true;
         }
-        if(!lines[index].split(":")[0].equals("accept-version")){
-            if(lines[index].split(":").length>1&&!lines[index].split(":")[1].equals("1.2"))
-            sendError("accept-version is not valid");
+        if(lines[index].split(":")[0].equals("accept-version")){
+            if(lines[index].split(":").length<=1||!lines[index].split(":")[1].equals("1.2"))
+                sendError("accept-version is not valid");
             else
                 IsacceptVersion=true;
         }
-        if(lines[index].split(":")[0].equals("username")){
+        if(lines[index].split(":")[0].equals("login")){
             if(lines[index].split(":").length==1)
             sendError("username is not valid");
             else{
@@ -143,7 +151,7 @@ public void  caseConnect(String[] lines,String message){
                  Isusername=true;}
         }
         
-        if(lines[index].split(":")[0].equals("password")){ 
+        if(lines[index].split(":")[0].equals("passcode")){ 
             if(lines[index].split(":").length==1)
             sendError("password is not valid");
             else if(!connections.isRegisterd(username)||connections.IsCorrectPassword(username,password)){
@@ -156,17 +164,15 @@ public void  caseConnect(String[] lines,String message){
 
         index++;
         
-    
-     if(Ispassword&&IsacceptVersion&&Ishost&&Isusername)
+}
+if(Ispassword&&IsacceptVersion&&Ishost&&Isusername)
        {
         connections.connect(username, password, connectionId);
-        connections.send(connectionId, "CONNECTED\nversion:1.2\n\n");
+        connections.send(connectionId, "CONNECTED\nversion:1.2\n");
         checkAndSendRecipt(lines);
        }
        else
         terminate=true;
-        
-}
 }
 
 
@@ -177,7 +183,7 @@ public void caseSend(String[] lines,String message)
     int index=1;
     boolean Isdestination=false;
     boolean Isbody=false;
-    while(index<lines.length-1)
+    while(index<lines.length)
     {
         if(lines[index].split(":")[0].equals("destination")){
             if(lines[index].split(":").length==1)
@@ -191,17 +197,18 @@ public void caseSend(String[] lines,String message)
         index++;
         
     
-     if(Isbody&&Isdestination){
-        if(!connections.IsSubscribed(connectionId, destination))
-        sendError("Not subscribed to channel");
-        else{
-        body="MESSAGE\nsubscription:"+Integer.toString(connections.getClientTopicId(connectionId,destination))+"\n"+"message - id:"+Integer.toString(connections.getMessageId())+"\ndestination:"+destination+"\n\n"+body+"\n";
-        connections.send(destination, body,connectionId);
-        checkAndSendRecipt(lines);}
 
-    }
     
         
+        }
+        if(Isbody&&Isdestination){
+            if(!connections.IsSubscribed(connectionId, destination))
+            sendError("Not subscribed to channel");
+            else{
+            body="MESSAGE\nsubscription:"+Integer.toString(connections.getClientTopicId(connectionId,destination))+"\n"+"message - id:"+Integer.toString(connections.getMessageId())+"\ndestination:"+destination+"\n\n"+body+"\n";
+            connections.send(destination, body,connectionId);
+            checkAndSendRecipt(lines);}
+    
         }
     }
 
@@ -212,7 +219,7 @@ public void caseSend(String[] lines,String message)
         boolean IsId=false;
         String topic="";
         int id=-77;
-        while(i<lines.length-1)
+        while(i<lines.length)
         {
             if(lines[i].split(":")[0].equals("destination")){
                 if(lines[i].split(":").length==1)
@@ -241,7 +248,7 @@ public void caseSend(String[] lines,String message)
     public void caseUnsubscribe(String[] lines,String message)
     {
         
-        for(int i=1; i<lines.length-1; i++)
+        for(int i=1; i<lines.length; i++)
         {if(lines[i].split(":")[0].equals("id"))
         {
             if(lines[i].split(":").length==1)
@@ -271,7 +278,7 @@ public void caseSend(String[] lines,String message)
     }
     public void checkAndSendRecipt(String[] lines)
     {
-        for(int i=1; i<lines.length-1; i++)
+        for(int i=1; i<lines.length; i++)
         if(lines[i].split(":")[0].equals("receipt -id"))
         {
             if(lines[1].split(":").length==1){
@@ -288,7 +295,7 @@ public void caseSend(String[] lines,String message)
 
     public String checkReciptToAddForError(String[] lines)
     {
-        for(int i=1; i<lines.length-1; i++){
+        for(int i=1; i<lines.length; i++){
         if(lines[i].split(":")[0].equals("receipt"))
         {
             if(lines[1].split(":").length==1){
@@ -313,7 +320,7 @@ public void caseSend(String[] lines,String message)
     private void sendError(String message)
     {
         errorM+=message+"\n-----\n";
-        connections.send(connectionId, errorM+message+"\n");
+        connections.send(connectionId, errorM);
         disconnect();
         terminate=true;
     }
