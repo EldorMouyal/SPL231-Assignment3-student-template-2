@@ -34,6 +34,14 @@ public class StompMessagingProtocolImpl implements StompMessagingProtocol<String
         else
             switch(lines[0].toUpperCase()){
                 case "CONNECT":
+                System.out.println("connect in proccess");
+                if(!connections.isConnected(connectionId))
+                    caseConnect(lines,message);
+                    else
+                        sendError("Already connected");
+                    break;
+
+                case "STOMP":
                 if(!connections.isConnected(connectionId))
                     caseConnect(lines,message);
                     else
@@ -124,7 +132,7 @@ public void  caseConnect(String[] lines,String message){
     while(index<lines.length)
     {
         if(lines[index].split(":")[0].equals("host")){
-            if(!lines[index].split(":")[1].equals("stomp.cs.bgu.ac.il"))
+            if(!lines[index].split(":")[1].equals("stomp.cs.bgu.ac.il")||!lines[index].split(":")[1].equals("localhost"))//local host case is for testing
             sendError("host is not valid");
             else
                 Ishost=true;
