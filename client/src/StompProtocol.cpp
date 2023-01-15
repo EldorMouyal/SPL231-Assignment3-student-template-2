@@ -17,7 +17,7 @@ string StompProtocol::reportProcess(string report)
 }
 bool StompProtocol::IsConnectedMsg(string msg)
 {
- vector<string> words = split(msg,'\n')
+ vector<string> words = split(msg,'\n');
     if(msg == "CONNECTED")
         return true;
     return false;
