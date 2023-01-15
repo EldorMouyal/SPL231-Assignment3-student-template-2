@@ -5,6 +5,7 @@ import bgu.spl.net.api.MessageEncoderDecoder;
 import bgu.spl.net.api.StompMessagingProtocol;
 import bgu.spl.net.impl.ConnectionsImpl;
 //import bgu.spl.net.impl.StompMessageEncoderDecoder;
+import bgu.spl.net.impl.StompMessagingProtocolImpl;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -107,6 +108,7 @@ public class Reactor<T> implements Server<T> {
                 protocolFactory.get(),
                 clientChan,
                 this);
+                ((StompMessagingProtocolImpl)handler.protocol).start(connectionId,(ConnectionsImpl<String>)connections);//Added$$$$$$$$
         clientChan.register(selector, SelectionKey.OP_READ, handler);
         connections.addConnection(handler,connectionId);//Added$$$$$$$$
         connectionId++;

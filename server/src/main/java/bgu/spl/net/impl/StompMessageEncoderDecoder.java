@@ -11,7 +11,7 @@ public class StompMessageEncoderDecoder implements MessageEncoderDecoder<String>
 
     @Override
     public String decodeNextByte(byte nextByte) {
-        if (nextByte == '\u0000') {
+        if (nextByte == '@') {
             return popString();
         }
 
