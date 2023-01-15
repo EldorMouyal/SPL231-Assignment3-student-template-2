@@ -133,6 +133,6 @@ string stompFrame::buildFrame()
     if (body.length() > 0)
         out += (body) + "\n";
 
-    out += "@";
+    out += "\0";
     return out;
 }

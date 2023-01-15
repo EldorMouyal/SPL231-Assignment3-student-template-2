@@ -15,10 +15,17 @@ string StompProtocol::reportProcess(string report)
     report.erase(0, position +1);
     return report;
 }
-bool StompProtocol::IsConnectedMsg(string msg)
+bool StompProtocol::isConnectedMsg(string msg)
 {
  vector<string> words = split(msg,'\n');
-    if(msg == "CONNECTED")
+    if(words.size()>0&&words[1] == "CONNECTED")
+        return true;
+    return false;
+}
+bool StompProtocol::isErrorMsg(string msg)
+{
+ vector<string> words = split(msg,'\n');
+    if(words.size()>0&&words[1] == "ERROR")
         return true;
     return false;
 }
