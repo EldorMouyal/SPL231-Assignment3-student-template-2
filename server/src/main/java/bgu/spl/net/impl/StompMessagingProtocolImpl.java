@@ -137,9 +137,9 @@ public void  caseConnect(String[] lines,String message){
             else
                 Ishost=true;
         }
-        if(!lines[index].split(":")[0].equals("accept-version")){
-            if(lines[index].split(":").length>1&&!lines[index].split(":")[1].equals("1.2"))
-            sendError("accept-version is not valid");
+        if(lines[index].split(":")[0].equals("accept-version")){
+            if(lines[index].split(":").length<=1||!lines[index].split(":")[1].equals("1.2"))
+                sendError("accept-version is not valid");
             else
                 IsacceptVersion=true;
         }
@@ -164,17 +164,15 @@ public void  caseConnect(String[] lines,String message){
 
         index++;
         
-    
-     if(Ispassword&&IsacceptVersion&&Ishost&&Isusername)
+}
+if(Ispassword&&IsacceptVersion&&Ishost&&Isusername)
        {
         connections.connect(username, password, connectionId);
-        connections.send(connectionId, "CONNECTED\nversion:1.2\n\n");
+        connections.send(connectionId, "CONNECTED\nversion:1.2\n");
         checkAndSendRecipt(lines);
        }
        else
         terminate=true;
-        
-}
 }
 
 
@@ -199,17 +197,18 @@ public void caseSend(String[] lines,String message)
         index++;
         
     
-     if(Isbody&&Isdestination){
-        if(!connections.IsSubscribed(connectionId, destination))
-        sendError("Not subscribed to channel");
-        else{
-        body="MESSAGE\nsubscription:"+Integer.toString(connections.getClientTopicId(connectionId,destination))+"\n"+"message - id:"+Integer.toString(connections.getMessageId())+"\ndestination:"+destination+"\n\n"+body+"\n";
-        connections.send(destination, body,connectionId);
-        checkAndSendRecipt(lines);}
 
-    }
     
         
+        }
+        if(Isbody&&Isdestination){
+            if(!connections.IsSubscribed(connectionId, destination))
+            sendError("Not subscribed to channel");
+            else{
+            body="MESSAGE\nsubscription:"+Integer.toString(connections.getClientTopicId(connectionId,destination))+"\n"+"message - id:"+Integer.toString(connections.getMessageId())+"\ndestination:"+destination+"\n\n"+body+"\n";
+            connections.send(destination, body,connectionId);
+            checkAndSendRecipt(lines);}
+    
         }
     }
 
@@ -321,7 +320,7 @@ public void caseSend(String[] lines,String message)
     private void sendError(String message)
     {
         errorM+=message+"\n-----\n";
-        connections.send(connectionId, errorM+message+"\n");
+        connections.send(connectionId, errorM);
         disconnect();
         terminate=true;
     }
