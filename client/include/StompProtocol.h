@@ -13,4 +13,6 @@ private:
 public:
 string reportProcess(string report);
 string getName(string report);
+bool IsConnectedMsg(string msg);
+vector<string> split(const string &str, char delimiter);
 };
