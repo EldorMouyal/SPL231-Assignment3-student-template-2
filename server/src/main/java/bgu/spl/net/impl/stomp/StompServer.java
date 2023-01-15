@@ -10,7 +10,7 @@ public class StompServer {
         //args= new String[]{"7777","tpc"};
         if(args.length>=2)
         {
-        args = new String[] {"127.0.0.1", "tpc"};
+        //args = new String[] {"127.0.0.1", "tpc"};
         if(args[1].equals("reactor"))
             Server.reactor(
                     Runtime.getRuntime().availableProcessors(),
