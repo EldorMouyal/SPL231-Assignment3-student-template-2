@@ -279,7 +279,7 @@ public void caseSend(String[] lines,String message)
     public void checkAndSendRecipt(String[] lines)
     {
         for(int i=1; i<lines.length; i++)
-        if(lines[i].split(":")[0].equals("receipt-id"))
+        if(lines[i].split(":")[0].equals("receipt"))
         {
             if(lines[1].split(":").length==1){
                 sendError("receipt is not valid");

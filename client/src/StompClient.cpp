@@ -141,10 +141,8 @@ void pullThreadMethod()
     while (userConnected)
     {
         string line;
-        cout<<"BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"<< endl;
-        if (cHandler->getLine(line))
-        {
-            cout<<"AAAAAAAAAAAAAAAAAAAAAAAAAA"<< endl;
+        if (cHandler->getFrameAscii(line,'\0')){
+            cout<<line<< endl;
             //if line is subscription confirmation or topic feed.
         }
     }
@@ -219,6 +217,8 @@ int main(int argc, char *argv[])
     {
         vector<string> words = getWords();
         string command = words[0];
+        if(command=="stop")
+            return 0;
 
         if (command == "login" && userConnected)
         {
@@ -242,13 +242,15 @@ int main(int argc, char *argv[])
         {
             handleLogoutCommand();
             receipt++;
+            
         }
         else if (command == "exit")
         {
             handleUnsubscribeCommand(words);
             receipt++;
-            return 0;
+            
         }
+        
         else
         {
             cout << "Invalid command" << endl;
