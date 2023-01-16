@@ -108,7 +108,7 @@ void pullThreadMethod()
 
 void runPullThread()
 {
-    if (isPullThreadStarted)
+    if (!isPullThreadStarted)
     {
     isPullThreadStarted = true;
     std::thread pullThread(pullThreadMethod);
