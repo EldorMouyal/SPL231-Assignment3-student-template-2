@@ -142,6 +142,7 @@ void pullThreadMethod()
     {
         string line;
         if (cHandler->getFrameAscii(line,'\0')){
+            protocol.Process(line);
             cout<<line<< endl;
             //if line is subscription confirmation or topic feed.
         }
