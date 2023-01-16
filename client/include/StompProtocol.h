@@ -13,8 +13,10 @@ private:
 ConnectionHandler &cHandler;
 map<int, string> receiptIds;
 
+
 public:
 StompProtocol(ConnectionHandler &connectionHandler);
+vector<string> Split(const string &str, char delimiter);//splits the string by the delimiter
 void Process(string report);//
 string getBodyOfReport(string report);//gets the body of the report
 string getName(string report);//gets the name of the user from a report

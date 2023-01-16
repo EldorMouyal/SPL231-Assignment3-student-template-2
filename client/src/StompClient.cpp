@@ -8,6 +8,7 @@ using namespace std;
 using std::string;
 
 
+
 int receipt = 0;
 int subscriptionID = 0;
 string connectedUser;
@@ -114,7 +115,7 @@ void handleLoginCommand(vector<string> words)
                 else
                 {
                     protocol.Process(loginResponse);
-                    cout << "Could not perform the login operation" << endl;
+                    cout << "Could not perform the login operation00000" << endl;
                 }
                 // When login successfull...
                 
@@ -155,13 +156,13 @@ void handleSubscribeCommand(vector<string> words)
     {
         if (!isPullThreadStarted)
         {
-            int subId = stoi(split(words[2], ':')[1]);
-            string topic = split(words[1], ':')[1];
-            subscriptions.insert(pair<int, string>(subId, topic));
-            protocol.insertReceiptAndResponse(receipt, "Joined channel " + topic);
             isPullThreadStarted = true;
             std::thread pullThread(pullThreadMethod, cHandler);
         }
+        int subId = subscriptionID;
+        string topic = words[1];
+        subscriptions.insert(pair<int, string>(subId, topic));
+        protocol.insertReceiptAndResponse(receipt, "Joined channel " + topic);
     }
     else
     {
@@ -175,14 +176,14 @@ void handleUnsubscribeCommand(vector<string> words)
     {
         if (!isPullThreadStarted)
         {
-            int subId= stoi((split(words[2],':')[1]));//get the subscription id
-
-            string expecedResponse="Exited channel"+subscriptions[subId];//create the expected response
-            protocol.insertReceiptAndResponse(receipt, expecedResponse);//insert the expected response to the map
-            subscriptions.erase(subId);//erase the subscription from the map
+            
             isPullThreadStarted = true;
             std::thread pullThread(pullThreadMethod, cHandler);
         }
+            int subId= stoi((split(words[2],':')[1]));//get the subscription id
+            string expecedResponse="Exited channel"+subscriptions[subId];//create the expected response
+            protocol.insertReceiptAndResponse(receipt, expecedResponse);//insert the expected response to the map
+            subscriptions.erase(subId);//erase the subscription from the map
     }
     else
     {
@@ -230,9 +231,10 @@ int main(int argc, char *argv[])
         {
             handleLoginCommand(words);
         }
-        else if (command == "subscribe")
+        else if (command == "join")
         {
             handleSubscribeCommand(words);
+            subscriptionID++;
             receipt++;
         }
         else if (command == "logout")
