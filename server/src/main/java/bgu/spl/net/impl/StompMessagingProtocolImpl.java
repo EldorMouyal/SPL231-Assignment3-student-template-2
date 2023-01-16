@@ -268,7 +268,7 @@ public void caseSend(String[] lines,String message)
 
     public void caseDisconnect(String[] lines,String message)
     {
-        if(lines[1].split(":").length==2&&lines[1].split(":")[0]=="receipt") {
+        if(lines[1].split(":").length==2&&lines[1].split(":")[0].equals("receipt")) {
             int recipt = Integer.parseInt(lines[1].split(":")[1]);
             connections.send(connectionId, "RECEIPT\nreceipt-id:" + recipt + "\n\u0000");
             disconnect();

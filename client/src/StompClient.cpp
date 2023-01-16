@@ -10,6 +10,7 @@ using std::string;
 
 
 int receipt = 0;
+int logoutReceipt = -1;
 int subscriptionID = 0;
 string connectedUser;
 ConnectionHandler *cHandler;
@@ -88,6 +89,32 @@ bool getLineAndSendFrame()
     std::string line = getLine();
     return sendLineFrame(line);
 }
+void pullThreadMethod()
+{
+    while (userConnected)
+    {
+        string line;
+        if (cHandler->getFrameAscii(line,'\0')){
+            if(!protocol.Process(line))
+            {
+                userConnected = false;
+                isPullThreadStarted = false;
+                cHandler->close();
+            }
+            cout<<line<< endl;
+        }
+    }
+}
+
+void runPullThread()
+{
+    if (isPullThreadStarted)
+    {
+    isPullThreadStarted = true;
+    std::thread pullThread(pullThreadMethod);
+    pullThread.detach();
+    }
+}
 
 void handleLoginCommand(vector<string> words)
 {
@@ -118,6 +145,7 @@ void handleLoginCommand(vector<string> words)
                     cout << "Could not perform the login operation00000" << endl;
                 }
                 // When login successfull...
+                runPullThread();//adddeedddd
                 
             }
             else
@@ -136,17 +164,7 @@ void handleLoginCommand(vector<string> words)
     }
 }
 
-void pullThreadMethod()
-{
-    while (userConnected)
-    {
-        string line;
-        if (cHandler->getFrameAscii(line,'\0')){
-            protocol.Process(line);
-            cout<<line<< endl;
-        }
-    }
-}
+
 
 void handleSubscribeCommand(vector<string> words)
 {
@@ -156,12 +174,6 @@ void handleSubscribeCommand(vector<string> words)
         string topic = words[1];
         subscriptions.insert(pair<int, string>(subId, topic));
         protocol.insertReceiptAndResponse(receipt, "Joined channel " + topic);
-        if (!isPullThreadStarted)
-        {
-            isPullThreadStarted = true;
-            std::thread pullThread(pullThreadMethod);
-            pullThread.join();
-        }
         
     }
     else
@@ -174,12 +186,6 @@ void handleUnsubscribeCommand(vector<string> words)
 {
     if (sendFrame(words))
     {
-        if (!isPullThreadStarted)
-        {
-            
-            isPullThreadStarted = true;
-            std::thread pullThread(pullThreadMethod);
-        }
             int subId= stoi((split(words[2],':')[1]));//get the subscription id
             string expecedResponse="Exited channel"+subscriptions[subId];//create the expected response
             protocol.insertReceiptAndResponse(receipt, expecedResponse);//insert the expected response to the map
@@ -197,15 +203,14 @@ void handleLogoutCommand()
     {
         string expecedResponse="";//create the expected response
         protocol.insertReceiptAndResponse(receipt, expecedResponse);
-        userConnected = false;
-        isPullThreadStarted = false;
-        cHandler->close();
     }
     else
     {
         //Handle logout error.
     }
 }
+
+
 
 int main(int argc, char *argv[])
 {

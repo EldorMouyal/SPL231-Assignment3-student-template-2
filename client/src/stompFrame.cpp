@@ -94,7 +94,7 @@ void stompFrame::createReportFrame(string file, string userName)
 void stompFrame::createLogoutFrame(int receipt)
 { // where do I get this recipt from?
     addCommand("DISCONNECT");
-    addHeader("receipt", "" + receipt);
+    addHeader("receipt", "" + to_string(receipt));
     frames.push_back(buildFrame());
 }
 
