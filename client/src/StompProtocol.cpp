@@ -3,7 +3,9 @@
 using std::string;
 
 StompProtocol::StompProtocol(ConnectionHandler &connectionHandler) : cHandler(connectionHandler)
-{}
+{
+    map<int, string> receiptIds();
+}
 //================================================================================================
 void StompProtocol::Process(string msg)
 {
@@ -18,10 +20,6 @@ void StompProtocol::Process(string msg)
         doc.write(body);
     }
 
-    else if(isConnectedMsg(msg))
-    {
-    }
-
     else if(isErrorMsg(msg))
     {
         cHandler.close();
@@ -29,6 +27,8 @@ void StompProtocol::Process(string msg)
 
     else if(isReceiptMsg(msg))
     {
+        string response= getResponse(getReceiptId(msg));
+        cout<<response<<endl;
     }
 
     else if(isDisconnectedMsg(msg))
@@ -138,6 +138,27 @@ vector<string> StompProtocol::getTeamsNames(string msg)//need to change
     return output;
 }
 
+bool StompProtocol::insertReceiptAndResponse(int receiptId, string response)
+{
+    
+    if(receiptIds.find(receiptId) == receiptIds.end())
+    {
+        receiptIds.insert({receiptId,response});
+        return true;
+    }
+    return false;
+}
+
+string StompProtocol::getResponse(int receiptId)
+{
+    if(receiptIds.find(receiptId) != receiptIds.end())
+    {
+        string response = receiptIds[receiptId];
+        receiptIds.erase(receiptId);
+        return response;
+    }
+    return "not a valid receipt id";
+}
  vector<string> split(const string &str, char delimiter)
 {
     vector<string> result;
