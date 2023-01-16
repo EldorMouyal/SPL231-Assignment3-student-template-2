@@ -144,7 +144,6 @@ void pullThreadMethod()
         if (cHandler->getFrameAscii(line,'\0')){
             protocol.Process(line);
             cout<<line<< endl;
-            //if line is subscription confirmation or topic feed.
         }
     }
 }
@@ -153,16 +152,17 @@ void handleSubscribeCommand(vector<string> words)
 {
     if (sendFrame(words))
     {
+        int subId = subscriptionID;
+        string topic = words[1];
+        subscriptions.insert(pair<int, string>(subId, topic));
+        protocol.insertReceiptAndResponse(receipt, "Joined channel " + topic);
         if (!isPullThreadStarted)
         {
             isPullThreadStarted = true;
             std::thread pullThread(pullThreadMethod);
             pullThread.join();
         }
-        int subId = subscriptionID;
-        string topic = words[1];
-        subscriptions.insert(pair<int, string>(subId, topic));
-        protocol.insertReceiptAndResponse(receipt, "Joined channel " + topic);
+        
     }
     else
     {
