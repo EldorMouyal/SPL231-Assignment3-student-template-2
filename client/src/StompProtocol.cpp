@@ -90,14 +90,14 @@ bool StompProtocol::isReportMsg(string msg)
 bool StompProtocol::isErrorMsg(string msg)
 {
  vector<string> words = Split(msg,'\n');
-    if(words.size()>0&&words[1] == "ERROR")
+    if(words.size()>0&&words[0] == "ERROR")
         return true;
     return false;
 }
 bool StompProtocol::isReceiptMsg(string msg)
 {
     vector<string> words = Split(msg,'\n');
-    if(words.size()>0&&words[1] == "RECEIPT")
+    if(words.size()>0&&words[0] == "RECEIPT")
         return true;
     return false;
 }
@@ -105,7 +105,7 @@ bool StompProtocol::isReceiptMsg(string msg)
 int StompProtocol::getReceiptId(string msg)//suitable for disconnected an reciept fram
 {
     vector<string> words = Split(msg,'\n');
-    string id = words[2];
+    string id = words[1];
     id.erase(0, id.find(":")+1);
     return stoi(id);
 }

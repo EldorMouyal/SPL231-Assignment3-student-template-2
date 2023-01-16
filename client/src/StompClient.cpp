@@ -141,11 +141,9 @@ void pullThreadMethod()
     while (userConnected)
     {
         string line;
-        cout<<"BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"<< endl;
-        if (cHandler->getLine(line))
-        {
-            cout<<"AAAAAAAAAAAAAAAAAAAAAAAAAA"<< endl;
-            //if line is subscription confirmation or topic feed.
+        if (cHandler->getFrameAscii(line,'\0')){
+            protocol.Process(line);
+            cout<<line<< endl;
         }
     }
 }
@@ -154,16 +152,17 @@ void handleSubscribeCommand(vector<string> words)
 {
     if (sendFrame(words))
     {
+        int subId = subscriptionID;
+        string topic = words[1];
+        subscriptions.insert(pair<int, string>(subId, topic));
+        protocol.insertReceiptAndResponse(receipt, "Joined channel " + topic);
         if (!isPullThreadStarted)
         {
             isPullThreadStarted = true;
             std::thread pullThread(pullThreadMethod);
             pullThread.join();
         }
-        int subId = subscriptionID;
-        string topic = words[1];
-        subscriptions.insert(pair<int, string>(subId, topic));
-        protocol.insertReceiptAndResponse(receipt, "Joined channel " + topic);
+        
     }
     else
     {
@@ -219,6 +218,8 @@ int main(int argc, char *argv[])
     {
         vector<string> words = getWords();
         string command = words[0];
+        if(command=="stop")
+            return 0;
 
         if (command == "login" && userConnected)
         {
@@ -242,13 +243,15 @@ int main(int argc, char *argv[])
         {
             handleLogoutCommand();
             receipt++;
+            
         }
         else if (command == "exit")
         {
             handleUnsubscribeCommand(words);
             receipt++;
-            return 0;
+            
         }
+        
         else
         {
             cout << "Invalid command" << endl;
