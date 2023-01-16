@@ -28,10 +28,10 @@ if (IsFileEmpty())
 FileReaderWriter::~FileReaderWriter()
 {}
 
-void FileReaderWriter::write(string line) {
+void FileReaderWriter::write(string body) {
     ofstream file;
     file.open(m_file, ios::app);
-    file << "General stats:\n"+line << "\n\n";
+    file << "General stats:\n"+body << "\n\n";
     file.close();
 }
 string FileReaderWriter::read()
