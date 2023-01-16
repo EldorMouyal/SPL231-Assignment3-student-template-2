@@ -3,9 +3,8 @@
 using std::string;
 
 StompProtocol::StompProtocol(ConnectionHandler &connectionHandler) : cHandler(connectionHandler)
-{
-
-}
+{}
+//================================================================================================
 void StompProtocol::Process(string msg)
 {
     if(isReportMsg(msg))
@@ -38,6 +37,8 @@ void StompProtocol::Process(string msg)
     }
 
 }
+//================================================================================================
+
 string StompProtocol::getBodyOfReport(string report)
 {
     string body= report;
