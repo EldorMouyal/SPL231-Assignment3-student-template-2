@@ -5,6 +5,7 @@ using std::string;
 StompProtocol::StompProtocol(ConnectionHandler &connectionHandler) : cHandler(connectionHandler)
 {
     map<int, string> receiptIds();
+    logoutReceipt = -1;
 }
 
 vector<string> StompProtocol::Split(const string &str, char delimiter)
@@ -27,7 +28,7 @@ vector<string> StompProtocol::Split(const string &str, char delimiter)
     return result;
 }
 //================================================================================================
-void StompProtocol::Process(string msg)
+bool StompProtocol::Process(string msg)
 {
     if(isReportMsg(msg))
     {
@@ -48,13 +49,20 @@ void StompProtocol::Process(string msg)
     else if(isReceiptMsg(msg))
     {
         string response= getResponse(getReceiptId(msg));
+        int id = getReceiptId(msg);
         cout<<response<<endl;
+        if(id == logoutReceipt)
+        {
+            return false;
+        }
+        
     }
 
     else if(isDisconnectedMsg(msg))
     {
-        cHandler.close();
+        
     }
+    return true;
 
 }
 //================================================================================================
@@ -180,4 +188,8 @@ string StompProtocol::getResponse(int receiptId)
     return "not a valid receipt id";
 }
  
+void StompProtocol::setLogoutReceipt(int id)
+{
+    logoutReceipt = id;
+}
     
