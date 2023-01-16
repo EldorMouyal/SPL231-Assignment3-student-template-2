@@ -29,24 +29,50 @@ bool StompProtocol::isErrorMsg(string msg)
         return true;
     return false;
 }
+bool StompProtocol::isReceiptMsg(string msg)
+{
+    vector<string> words = split(msg,'\n');
+    if(words.size()>0&&words[1] == "RECEIPT")
+        return true;
+    return false;
+}
+
+int StompProtocol::getReceiptId(string msg)//suitable for disconnected an reciept fram
+{
+    vector<string> words = split(msg,'\n');
+    string id = words[2];
+    id.erase(0, id.find(":")+1);
+    return stoi(id);
+}
+
+bool StompProtocol::isDisconnectedMsg(string msg)
+{
+    vector<string> words = split(msg,'\n');
+    if(words.size()>0&&words[0] == "DISCONNECTED")
+        return true;
+    return false;
+}
+
 
 string StompProtocol::getName(string report)
 {
+    string output= report;
     int numOfEnters =3;
     string delimiter = "\n";
     int position = 0;    
     while(numOfEnters>0){        
-        position = report.find(delimiter);
+        position = output.find(delimiter);
         numOfEnters--;
     }
-    report.erase(0, position +1);
+    output.erase(0, position +1);
     numOfEnters =1;
     while(numOfEnters>0){        
-        position = report.find(delimiter);
+        position = output.find(delimiter);
         numOfEnters--;
     }
-    report.erase(position, report.size()+1-position);
-    return report;
+    output.erase(position, output.size()+1-position);//name:XXXX is output value by now
+    output.erase(0, output.find(":")+1);//XXXX is output value by now
+    return output;
 }
 
  vector<string> split(const string &str, char delimiter)

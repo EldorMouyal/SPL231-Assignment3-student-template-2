@@ -13,6 +13,9 @@ private:
 public:
 string reportProcess(string report);
 string getName(string report);
-bool IsConnectedMsg(string msg);
-vector<string> split(const string &str, char delimiter);
+bool isConnectedMsg(string msg);//returns true for connected frame
+bool isErrorMsg(string msg);//returns true for error frame
+bool isReceiptMsg(string msg);//returns true for reciept frame
+int getReceiptId(string msg);//suitable for disconnected an reciept frames
+bool isDisconnectedMsg(string msg);//eturns true for disconnected frame
 };
