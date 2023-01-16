@@ -132,7 +132,7 @@ public void  caseConnect(String[] lines,String message){
     while(index<lines.length)
     {
         if(lines[index].split(":")[0].equals("host")){
-            if(!lines[index].split(":")[1].equals("stomp.cs.bgu.ac.il")||!lines[index].split(":")[1].equals("localhost"))//local host case is for testing
+            if(!lines[index].split(":")[1].equals("stomp.cs.bgu.ac.il"))//local host case is for testing
             sendError("host is not valid");
             else
                 Ishost=true;
@@ -270,7 +270,7 @@ public void caseSend(String[] lines,String message)
     {
         if(lines[1].split(":").length==2&&lines[1].split(":")[0]=="receipt") {
             int recipt = Integer.parseInt(lines[1].split(":")[1]);
-            connections.send(connectionId, "RECEIPT\nreceipt -id:" + recipt + "\n\u0000");
+            connections.send(connectionId, "RECEIPT\nreceipt-id:" + recipt + "\n\u0000");
             disconnect();
         }
         else
@@ -279,14 +279,14 @@ public void caseSend(String[] lines,String message)
     public void checkAndSendRecipt(String[] lines)
     {
         for(int i=1; i<lines.length; i++)
-        if(lines[i].split(":")[0].equals("receipt -id"))
+        if(lines[i].split(":")[0].equals("receipt-id"))
         {
             if(lines[1].split(":").length==1){
                 sendError("receipt is not valid");
             }
             else {
                 int recipt = Integer.parseInt(lines[i].split(":")[1]);
-                connections.send(connectionId, "RECEIPT\nreceipt -id:"+recipt+"\n\u0000");
+                connections.send(connectionId, "RECEIPT\nreceipt-id:"+recipt+"\n\u0000");
             }
         
         }
@@ -303,7 +303,7 @@ public void caseSend(String[] lines,String message)
                 return "";}
             else {
                 int recipt = Integer.parseInt(lines[i].split(":")[1]);
-                return "receipt -id:"+recipt+"\n";
+                return "receipt-id:"+recipt+"\n";
             }
         
         }

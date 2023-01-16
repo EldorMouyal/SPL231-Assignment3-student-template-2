@@ -57,7 +57,7 @@ bool sendFrame(vector<string> words)
     for (int i = 0; i < frames.size(); i++)
     {
         int len = frames[i].length();
-        if (!cHandler->sendLine(frames[i]))
+        if (!cHandler->sendFrameAscii(frames[i],'\0'))//###############
         {
             std::cout << "Disconnected. Exiting...\n"
                       << std::endl;
@@ -99,7 +99,7 @@ void handleLoginCommand(vector<string> words)
 
             // Getting login response.
             string loginResponse;
-            if (cHandler->getLine(loginResponse))
+            if (cHandler->getFrameAscii(loginResponse,'\0'))
             {
                 cout << loginResponse << endl;
                 // Decode STOMP frame and check for login confirmation.
@@ -123,13 +123,15 @@ void handleLoginCommand(vector<string> words)
     }
 }
 
-void pullThreadMethod(ConnectionHandler &handler)
+void pullThreadMethod(ConnectionHandler *handler)
 {
     while (userConnected)
     {
         string line;
+        cout<<"BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"<< endl;
         if (cHandler->getLine(line))
         {
+            cout<<"AAAAAAAAAAAAAAAAAAAAAAAAAA"<< endl;
             //if line is subscription confirmation or topic feed.
         }
     }
