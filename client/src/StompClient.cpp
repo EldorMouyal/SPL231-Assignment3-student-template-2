@@ -136,7 +136,7 @@ void handleLoginCommand(vector<string> words)
     }
 }
 
-void pullThreadMethod(ConnectionHandler *handler)
+void pullThreadMethod()
 {
     while (userConnected)
     {
@@ -157,7 +157,8 @@ void handleSubscribeCommand(vector<string> words)
         if (!isPullThreadStarted)
         {
             isPullThreadStarted = true;
-            std::thread pullThread(pullThreadMethod, cHandler);
+            std::thread pullThread(pullThreadMethod);
+            pullThread.join();
         }
         int subId = subscriptionID;
         string topic = words[1];
@@ -178,7 +179,7 @@ void handleUnsubscribeCommand(vector<string> words)
         {
             
             isPullThreadStarted = true;
-            std::thread pullThread(pullThreadMethod, cHandler);
+            std::thread pullThread(pullThreadMethod);
         }
             int subId= stoi((split(words[2],':')[1]));//get the subscription id
             string expecedResponse="Exited channel"+subscriptions[subId];//create the expected response
