@@ -3,7 +3,29 @@
 using std::string;
 
 StompProtocol::StompProtocol(ConnectionHandler &connectionHandler) : cHandler(connectionHandler)
-{}
+{
+    map<int, string> receiptIds();
+}
+
+vector<string> StompProtocol::Split(const string &str, char delimiter)
+{
+    vector<string> result;
+    string current;
+    for (const char &c : str)
+    {
+        if (c == delimiter)
+        {
+            result.push_back(current);
+            current.clear();
+        }
+        else
+        {
+            current += c;
+        }
+    }
+    result.push_back(current);
+    return result;
+}
 //================================================================================================
 void StompProtocol::Process(string msg)
 {
@@ -18,10 +40,6 @@ void StompProtocol::Process(string msg)
         doc.write(body);
     }
 
-    else if(isConnectedMsg(msg))
-    {
-    }
-
     else if(isErrorMsg(msg))
     {
         cHandler.close();
@@ -29,6 +47,8 @@ void StompProtocol::Process(string msg)
 
     else if(isReceiptMsg(msg))
     {
+        string response= getResponse(getReceiptId(msg));
+        cout<<response<<endl;
     }
 
     else if(isDisconnectedMsg(msg))
@@ -55,28 +75,28 @@ string StompProtocol::getBodyOfReport(string report)
 }
 bool StompProtocol::isConnectedMsg(string msg)
 {
- vector<string> words = split(msg,'\n');
-    if(words.size()>0&&words[1] == "CONNECTED")
+ vector<string> words = Split(msg,'\n');
+    if(words.size()>0&&words[0] == "CONNECTED")
         return true;
     return false;
 }
 bool StompProtocol::isReportMsg(string msg)
 {
-    vector<string> words = split(msg,'\n');
+    vector<string> words = Split(msg,'\n');
     if(words.size()>0&&words[0] == "SEND")
         return true;
     return false;
 }
 bool StompProtocol::isErrorMsg(string msg)
 {
- vector<string> words = split(msg,'\n');
+ vector<string> words = Split(msg,'\n');
     if(words.size()>0&&words[1] == "ERROR")
         return true;
     return false;
 }
 bool StompProtocol::isReceiptMsg(string msg)
 {
-    vector<string> words = split(msg,'\n');
+    vector<string> words = Split(msg,'\n');
     if(words.size()>0&&words[1] == "RECEIPT")
         return true;
     return false;
@@ -84,7 +104,7 @@ bool StompProtocol::isReceiptMsg(string msg)
 
 int StompProtocol::getReceiptId(string msg)//suitable for disconnected an reciept fram
 {
-    vector<string> words = split(msg,'\n');
+    vector<string> words = Split(msg,'\n');
     string id = words[2];
     id.erase(0, id.find(":")+1);
     return stoi(id);
@@ -92,7 +112,7 @@ int StompProtocol::getReceiptId(string msg)//suitable for disconnected an reciep
 
 bool StompProtocol::isDisconnectedMsg(string msg)
 {
-    vector<string> words = split(msg,'\n');
+    vector<string> words = Split(msg,'\n');
     if(words.size()>0&&words[0] == "DISCONNECTED")
         return true;
     return false;
@@ -125,11 +145,11 @@ vector<string> StompProtocol::getTeamsNames(string msg)//need to change
   string team_b="";
   vector<string> output;
 
-    vector<string> words = split(msg,'\n');
+    vector<string> words = Split(msg,'\n');
     for(int i=0;i<words.size();i++){
         if(words[i].find("destination") == 0){
-            vector<string> destination = split(words[i],':');
-            vector<string> teams   = split(destination[1],'_');
+            vector<string> destination = Split(words[i],':');
+            vector<string> teams   = Split(destination[1],'_');
             output.push_back(teams[0]);
             output.push_back(teams[1]);
             break;
@@ -138,23 +158,26 @@ vector<string> StompProtocol::getTeamsNames(string msg)//need to change
     return output;
 }
 
- vector<string> split(const string &str, char delimiter)
+bool StompProtocol::insertReceiptAndResponse(int receiptId, string response)
 {
-    vector<string> result;
-    string current;
-    for (const char &c : str)
+    
+    if(receiptIds.find(receiptId) == receiptIds.end())
     {
-        if (c == delimiter)
-        {
-            result.push_back(current);
-            current.clear();
-        }
-        else
-        {
-            current += c;
-        }
+        receiptIds.insert({receiptId,response});
+        return true;
     }
-    result.push_back(current);
-    return result;
+    return false;
 }
+
+string StompProtocol::getResponse(int receiptId)
+{
+    if(receiptIds.find(receiptId) != receiptIds.end())
+    {
+        string response = receiptIds[receiptId];
+        receiptIds.erase(receiptId);
+        return response;
+    }
+    return "not a valid receipt id";
+}
+ 
     
