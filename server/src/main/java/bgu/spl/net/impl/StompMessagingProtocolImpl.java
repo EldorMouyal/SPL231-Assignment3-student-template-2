@@ -193,11 +193,8 @@ public void caseSend(String[] lines,String message)
                  Isdestination=true;}
         }
         else{Isbody=true;
-<<<<<<< HEAD
             body+= lines[index]+"\n";}
-=======
-            body+= lines[index]+'\n';}
->>>>>>> omerFixServerBranch
+
         index++;
         
     
