@@ -2,7 +2,7 @@
 #include "../include/event.h"
 using namespace std;
 
-stompFrame::stompFrame(vector<string> &words, int _subscriptionID, int _receipt) : headers(), frames(), body(), frame(), subscriptionID(_subscriptionID), receipt(_receipt)
+stompFrame::stompFrame(vector<string> &words, int _subscriptionID, int _receipt,string username) : headers(), frames(), body(), frame(), subscriptionID(_subscriptionID), receipt(_receipt)
 {
     string command = words[0];
 
@@ -21,7 +21,7 @@ stompFrame::stompFrame(vector<string> &words, int _subscriptionID, int _receipt)
     }
     if (command == "report")
     {
-        createReportFrame(words[1], words[2]); // TODO: implement this later
+        createReportFrame(words[1],username); // TODO: implement this later
     }
     if (command == "logout")
     {
@@ -58,14 +58,14 @@ void stompFrame::createExitFrame(string gameName, int receipt)
     frames.push_back(buildFrame());
 }
 
-void stompFrame::createReportFrame(string file, string userName)
+void stompFrame::createReportFrame(string file,string username)
 {
     names_and_events nae = parseEventsFile(file);
     addCommand("SEND");
     addHeader("destination", '/' + nae.team_a_name + '_' + nae.team_b_name);
     for (int i = 0; i < nae.events.size(); i++)
     {
-        string body = "user: " + userName + '\n';
+        string body = "user: "+username+ '\n';
         body += "team a: " + nae.team_a_name + '\n';
         body += "team b: " + nae.team_b_name + '\n';
         body += "event name: " + nae.events[i].get_name() + '\n';
