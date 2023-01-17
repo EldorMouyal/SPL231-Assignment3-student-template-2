@@ -103,14 +103,14 @@ public class StompMessagingProtocolImpl implements StompMessagingProtocol<String
         int insertIndex=0;
         List<String> strings= new LinkedList<String>();
         for(String s:lines){
-            s.trim();
+            //s.trim();
             if(!s.equals("")){
                 strings.add(s);
             }
         }
         fixed= new String[strings.size()];
         for(String s:strings){
-            fixed[insertIndex]=s.trim();
+            fixed[insertIndex]=s;//.trim();
             if(insertIndex>0)
                 fixed[insertIndex].toLowerCase();
             insertIndex++;
