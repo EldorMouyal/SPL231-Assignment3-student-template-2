@@ -77,7 +77,7 @@ bool sendUnsubscribeFrame(vector<string> words)
         cout << "You are not subscribed to this game" << endl;
         return false;
     }
-    stompFrame frame = stompFrame(words, subID, receipt);
+    stompFrame frame = stompFrame(words, subID, receipt,connectedUser);
     vector<string> frames = frame.getFrames();
     cout << frames[0] << endl; // up to here;
     for (int i = 0; i < frames.size(); i++)
@@ -96,7 +96,7 @@ bool sendUnsubscribeFrame(vector<string> words)
 bool sendFrame(vector<string> words)
 {
     cout << "creating frame" << endl;
-    stompFrame frame = stompFrame(words, subscriptionID, receipt);
+    stompFrame frame = stompFrame(words, subscriptionID, receipt,connectedUser);
     vector<string> frames = frame.getFrames();
     cout << frames[0] << endl; // up to here;
     for (int i = 0; i < frames.size(); i++)
@@ -248,6 +248,15 @@ void handleLogoutCommand()
         //Handle logout error.
     }
 }
+void handleReportCommand(vector<string> words)
+{
+    if (sendFrame(words))
+    {
+        string expecedResponse="";//create the expected response
+        protocol.insertReceiptAndResponse(receipt, expecedResponse);
+    }
+
+}
 
 
 
@@ -294,6 +303,10 @@ int main(int argc, char *argv[])
             handleUnsubscribeCommand(words);
             receipt++;
             
+        }
+        else if(command== "report")
+        {
+            handleReportCommand(words);
         }
         
         else

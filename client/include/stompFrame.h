@@ -20,13 +20,13 @@ void setBody(std::string);
 void createLoginFrame(std::string port, std::string username, std::string password);
 void createJoinFrame(std::string gameName);
 void createExitFrame(std:: string gameName, int receipt);
-void createReportFrame(std::string report,std:: string userName);
+void createReportFrame(std::string report,std::string username);
 void createLogoutFrame(int receipt);
 std::string buildFrame();
 
 
 public:
-stompFrame(std::vector<std::string> &words, int id, int receipt);
+stompFrame(std::vector<std::string> &words, int id, int receipt,std::string username);
 std::vector<std::string> getFrames();
 
 };
