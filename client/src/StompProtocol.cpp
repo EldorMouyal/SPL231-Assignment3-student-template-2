@@ -43,7 +43,7 @@ bool StompProtocol::Process(string msg)
 
     else if(isErrorMsg(msg))
     {
-        cHandler.close();
+        return false;
     }
 
     else if(isReceiptMsg(msg))
