@@ -257,7 +257,7 @@ public void caseSend(String[] lines,String message)
                 }
             else{
                 int id= Integer.parseInt(lines[i].split(":")[1]);
-                connections.unsubscribe(connectionId,id);
+                connections.unsubscribe(id,connectionId);
                 checkAndSendRecipt(lines);
                 break;
                  }
