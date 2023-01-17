@@ -10,7 +10,6 @@ using std::string;
 
 
 int receipt = 0;
-int logoutReceipt = -1;
 int subscriptionID = 0;
 string connectedUser;
 ConnectionHandler *cHandler;
@@ -241,6 +240,7 @@ void handleLogoutCommand()
     if (sendLineFrame("logout"))
     {
         string expecedResponse="";//create the expected response
+        protocol.setLogoutReceipt(receipt);
         protocol.insertReceiptAndResponse(receipt, expecedResponse);
     }
     else

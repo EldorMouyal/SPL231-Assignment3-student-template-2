@@ -44,6 +44,15 @@ public class ConnectionsImpl<T> implements Connections<T> {
 
     @Override
     public void disconnect(int connectionId) {
+        for(String chanel: subscriptionsOfChannel.keySet())
+        {
+            for(Integer[] arr: subscriptionsOfChannel.get(chanel))
+            {
+                if(arr[0]==connectionId)
+                    subscriptionsOfChannel.get(chanel).remove(arr);
+            }
+        }
+        topicsOfClient.remove(connectionId);
         connections.remove(connectionId);
         UserNameToConnctionId.remove(getUserName(connectionId));
     }
