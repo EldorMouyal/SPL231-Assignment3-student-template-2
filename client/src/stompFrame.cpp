@@ -53,7 +53,7 @@ void stompFrame::createJoinFrame(string gameName)
 void stompFrame::createExitFrame(string gameName, int receipt)
 { // where do i get the receipt id according to the gameName?
     addCommand("UNSUBSCRIBE");
-    addHeader("id", "" + subscriptionID);
+    addHeader("id", "" + to_string(subscriptionID));
     addHeader("receipt", "" + to_string(receipt));
     frames.push_back(buildFrame());
 }

@@ -153,8 +153,8 @@ public void  caseConnect(String[] lines,String message){
         
         if(lines[index].split(":")[0].equals("passcode")){ 
             if(lines[index].split(":").length==1)
-            sendError("password is not valid");
-            else if(!connections.isRegisterd(username)||connections.IsCorrectPassword(username,password)){
+                sendError("password is not valid");
+            else if(!connections.isRegisterd(username)||connections.IsCorrectPassword(username,password= lines[index].split(":")[1])){
                 Ispassword=true;
                 password= lines[index].split(":")[1];
             }
@@ -257,7 +257,7 @@ public void caseSend(String[] lines,String message)
                 }
             else{
                 int id= Integer.parseInt(lines[i].split(":")[1]);
-                connections.unsubscribe(connectionId,id);
+                connections.unsubscribe(id,connectionId);
                 checkAndSendRecipt(lines);
                 break;
                  }

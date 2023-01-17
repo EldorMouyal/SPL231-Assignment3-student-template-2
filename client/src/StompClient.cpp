@@ -10,7 +10,6 @@ using std::string;
 
 
 int receipt = 0;
-int logoutReceipt = -1;
 int subscriptionID = 0;
 string connectedUser;
 ConnectionHandler *cHandler;
@@ -56,6 +55,44 @@ static vector<string> getWords()
     return words;
 }
 
+int getSubscriptionIdByGameName(string gameName)
+{
+    auto it = find_if(subscriptions.begin(), subscriptions.end(),
+                       [&gameName](const std::pair<int, std::string>& element) {
+                         return element.second == gameName;
+                       });
+    if (it != subscriptions.end())
+    {
+        return it->first;
+    }
+
+    return -1;
+}
+bool sendUnsubscribeFrame(vector<string> words)
+{
+    cout << "creating frame" << endl;
+    int subID = getSubscriptionIdByGameName(words[1]);//words[1] is the game name
+    if (subID == -1)
+    {
+        cout << "You are not subscribed to this game" << endl;
+        return false;
+    }
+    stompFrame frame = stompFrame(words, subID, receipt);
+    vector<string> frames = frame.getFrames();
+    cout << frames[0] << endl; // up to here;
+    for (int i = 0; i < frames.size(); i++)
+    {
+        int len = frames[i].length();
+        if (!cHandler->sendFrameAscii(frames[i],'\0'))//###############
+        {
+            std::cout << "Disconnected. Exiting...\n"
+                      << std::endl;
+            return false;
+        }
+        // connectionHandler.sendLine(line) appends '\n' to the message. Therefor we send len+1 bytes.
+        std::cout << "Sent " << len + 1 << " bytes to server" << std::endl;
+    }
+}
 bool sendFrame(vector<string> words)
 {
     cout << "creating frame" << endl;
@@ -184,12 +221,13 @@ void handleSubscribeCommand(vector<string> words)
 
 void handleUnsubscribeCommand(vector<string> words)
 {
-    if (sendFrame(words))
+    if (sendUnsubscribeFrame(words))
     {
-            int subId= stoi((split(words[2],':')[1]));//get the subscription id
-            string expecedResponse="Exited channel"+subscriptions[subId];//create the expected response
+            string sub= words[1];//get the subscription id
+            string expecedResponse="Exited channel "+sub;//create the expected response
             protocol.insertReceiptAndResponse(receipt, expecedResponse);//insert the expected response to the map
-            subscriptions.erase(subId);//erase the subscription from the map
+            int subId=getSubscriptionIdByGameName(sub);//get the subscription id
+            subscriptions.erase(subId);
     }
     else
     {
@@ -202,6 +240,7 @@ void handleLogoutCommand()
     if (sendLineFrame("logout"))
     {
         string expecedResponse="";//create the expected response
+        protocol.setLogoutReceipt(receipt);
         protocol.insertReceiptAndResponse(receipt, expecedResponse);
     }
     else

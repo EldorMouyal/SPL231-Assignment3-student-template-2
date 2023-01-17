@@ -44,6 +44,15 @@ public class ConnectionsImpl<T> implements Connections<T> {
 
     @Override
     public void disconnect(int connectionId) {
+        for(String chanel: subscriptionsOfChannel.keySet())
+        {
+            for(Integer[] arr: subscriptionsOfChannel.get(chanel))
+            {
+                if(arr[0]==connectionId)
+                    subscriptionsOfChannel.get(chanel).remove(arr);
+            }
+        }
+        topicsOfClient.remove(connectionId);
         connections.remove(connectionId);
         UserNameToConnctionId.remove(getUserName(connectionId));
     }
@@ -99,6 +108,9 @@ public class ConnectionsImpl<T> implements Connections<T> {
            arr[1]=topicId;
            list.add(arr);
            subscriptionsOfChannel.put(chanel, list);
+           HashMap <Integer,String> map = new HashMap<>();
+             map.put(topicId, chanel);
+           topicsOfClient.put(connectionId, map);
        }
        else
        {
@@ -106,6 +118,10 @@ public class ConnectionsImpl<T> implements Connections<T> {
            arr[0]=connectionId;
            arr[1]=topicId;
            subscriptionsOfChannel.get(chanel).add(arr);
+           HashMap <Integer,String> map = new HashMap<>();
+            map.put(topicId, chanel);
+            topicsOfClient.put(connectionId, map);
+
        }
     }
 
@@ -119,6 +135,7 @@ public class ConnectionsImpl<T> implements Connections<T> {
             if(a[0]==connectionId)
                 subscriptionsOfChannel.get(chanel).remove(a);
         }
+        topicsOfClient.get(connectionId).remove(id);
     }
     public void addConnection(ConnectionHandler<T> handler,int connectionId){
         connections.put(connectionId, handler);
