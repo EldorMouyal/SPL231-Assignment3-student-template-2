@@ -193,7 +193,7 @@ public void caseSend(String[] lines,String message)
                  Isdestination=true;}
         }
         else{Isbody=true;
-            body+= lines[index];}
+            body+= lines[index]+"\n";}
         index++;
         
     

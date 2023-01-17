@@ -74,17 +74,17 @@ void stompFrame::createReportFrame(string file,string username)
         // std::map<string,string> gameUpdates = nae.events[i].get_game_updates();
         for (pair<string, string> p : nae.events[i].get_game_updates())
         {
-            body += '\t' + p.first + ':' + p.second + '\n';
+            body += "   " + p.first + ':' + p.second + '\n';
         }
         body += "team a updates:" + '\n';
         for (pair<string, string> p : nae.events[i].get_team_a_updates())
         {
-            body += '\t' + p.first + ':' + p.second + '\n';
+            body += "   " + p.first + ':' + p.second + '\n';
         }
         body += "team b updates:" + '\n';
         for (pair<string, string> p : nae.events[i].get_team_b_updates())
         {
-            body += '\t' + p.first + ':' + p.second + '\n';
+            body += "   " + p.first + ':' + p.second + '\n';
         }
         body += "description:" + '\n' + nae.events[i].get_discription();
         setBody(body);
