@@ -283,8 +283,10 @@ int main(int argc, char *argv[])
             cout << "Must login first" << endl;
         }
         else if (command == "login")
-        {
-            handleLoginCommand(words);
+        {   if(!userConnected)
+                handleLoginCommand(words);
+            else
+                cout<<"The client is already logged in"<<endl;
         }
         else if (command == "join")
         {
