@@ -179,7 +179,7 @@ void handleLoginCommand(vector<string> words)
                 else
                 {
                     protocol.Process(loginResponse);
-                    cout << "Could not perform the login operation00000" << endl;
+                    cout << "Could not perform the login operation" << endl;
                 }
                 // When login successfull...
                 runPullThread();//adddeedddd
